@@ -6,16 +6,17 @@ import { useSearchParams } from 'react-router-dom';
 const Movies = () => {
   const [movieList, setMovieList] = useState();
   const [searchQuery, setSearchQuery] = useSearchParams();
-  const [value, setValue] = useState(searchQuery.get('query') || '');
   const [query, setQuery] = useState(searchQuery.get('query'))
+  const [value, setValue] = useState(searchQuery.get('query') || '');
 
   console.log(`MovieList: `, movieList);
   console.log(`searchQuery: `, searchQuery);
   console.log(`value: `, value);
 
+ 
+
   useEffect(() => {
     if (query) {
-      setSearchQuery({ query: value });
       getSearchMovie(query)
         .then(data => {
           setMovieList(data.results);
@@ -24,10 +25,11 @@ const Movies = () => {
           console.log(err);
         });
     }
-  }, [query]);
+  }, [query,setSearchQuery]);
 
   const handleSubmit = event => {
-    event.preventDefault();    
+    event.preventDefault(); 
+    setSearchQuery({ query: value  });   
     setQuery(value)
   };
 
