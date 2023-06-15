@@ -1,23 +1,38 @@
 import { getSearchMovie } from 'api/API';
 import MovieLink from 'components/Movie/MovieLink';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
-export const Movies = () => {
-  const [query, setQuery] = useState('');
-  const [movieList, setMovieList] = useState(null);
+const Movies = () => {
+  const [movieList, setMovieList] = useState();
+  const [searchQuery, setSearchQuery] = useSearchParams();
+  const [value, setValue] = useState(searchQuery.get('query') || '');
+  const [query, setQuery] = useState(searchQuery.get('query'))
+
+  console.log(`MovieList: `, movieList);
+  console.log(`searchQuery: `, searchQuery);
+  console.log(`value: `, value);
+
+  useEffect(() => {
+    if (query) {
+      setSearchQuery({ query: value });
+      getSearchMovie(query)
+        .then(data => {
+          setMovieList(data.results);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    }
+  }, [query]);
 
   const handleSubmit = event => {
-    event.preventDefault();
-    console.log(getSearchMovie(query));
-    getSearchMovie(query)
-    .then(data => {
-      setMovieList(data.results);
-    })
-    .catch((err)=>{console.log(err)})
+    event.preventDefault();    
+    setQuery(value)
   };
 
   const handleChange = event => {
-    setQuery(event.target.value);
+    setValue(event.target.value);
   };
 
   return (
@@ -30,7 +45,7 @@ export const Movies = () => {
         <input
           plaseholder="Search movie"
           name="query"
-          value={query}
+          value={value}
           onChange={handleChange}
         ></input>
         <button type="submit">Submit</button>
@@ -45,3 +60,5 @@ export const Movies = () => {
     </>
   );
 };
+
+export default Movies;
